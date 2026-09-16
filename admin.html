@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin - Riya Spa</title>
+<style>
+body{font-family:Inter,sans-serif; background:#f5f5f3; padding:16px; margin:0;}
+.card{max-width:460px; margin:auto; background:#fff; padding:22px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.1);}
+.input{width:100%; padding:12px; margin:6px 0 12px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box; background:#fafafa;}
+.btn{width:100%; background:#111; color:#fff; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; letter-spacing:1px;}
+label{font-size:10px; font-weight:800; color:#888; letter-spacing:1px;}
+#panel{display:none;}
+</style>
+</head>
+<body>
+<div class="card">
+<h2 style="text-align:center; letter-spacing:3px; margin:0 0 4px;">ADMIN LOGIN</h2>
+<p style="text-align:center; font-size:10px; color:#999; letter-spacing:2px; margin:0 0 12px;">RIYA SPA - SECURE</p>
+
+<input id="pass" type="password" class="input" placeholder="Enter Password" style="text-align:center; margin-top:14px;">
+<button class="btn" id="loginBtn" onclick="login()">🔓 LOGIN</button>
+<p id="err" style="color:red; font-size:11px; text-align:center; display:none; margin-top:8px;">❌ Wrong Password</p>
+
+<div id="panel">
+<div style="margin-top:18px; background:#fafafa; border:1px solid #eee; padding:14px; border-radius:14px;">
+<label>UPI ID (UPI Change Yaha Se Hoga)</label>
+<input id="upi" class="input" placeholder="upi@bank">
+
+<label>QR CODE IMAGE LINK</label>
+<input id="qr" class="input" placeholder="https://...qr.png">
+
+<label>BOOKING ADVANCE AMOUNT (1 Person Ka)</label>
+<input id="amt" type="number" class="input" placeholder="300">
+<div style="font-size:10px; color:#666; margin:-8px 0 10px; background:#fff; padding:6px 8px; border-radius:6px;">👉 Note: Yaha 300 daloge to 2 Person pe automatic ₹600 ho jayega QR pe</div>
+
+<label>1 HOUR PRICE</label>
+<input id="p1" type="number" class="input" placeholder="2000">
+
+<label>2 HOUR PRICE</label>
+<input id="p2" type="number" class="input" placeholder="3000">
+
+<label>3 HOUR PRICE</label>
+<input id="p3" type="number" class="input" placeholder="4000">
+
+<label>FULL NIGHT PRICE</label>
+<input id="p4" type="number" class="input" placeholder="6000">
+
+<label>TELEGRAM USERNAME (Bina @ ke)</label>
+<input id="tg" class="input" placeholder="Sonal_0101">
+</div>
+
+<button class="btn" onclick="save()" style="margin-top:16px; background:#111;">💾 SAVE & AUTO UPDATE WEBSITE</button>
+<p id="msg" style="text-align:center; font-weight:800; color:green; font-size:12px; margin-top:12px;"></p>
+
+<label style="margin-top:16px; display:block;">FINAL JSON (GitHub pe paste karne ke liye)</label>
+<textarea id="out" style="width:100%; height:220px; margin-top:6px; font-size:11px; border-radius:10px; padding:10px; border:1px solid #ddd; box-sizing:border-box; background:#f9f9f9;"></textarea>
+
+<button onclick="logout()" style="width:100%; background:none; border:none; color:#888; margin-top:14px; font-size:11px; cursor:pointer;">Logout</button>
+</div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "riya123";
+
+function login(){
+  if(document.getElementById('pass').value !== ADMIN_PASSWORD){
+    document.getElementById('err').style.display='block';
+    return;
+  }
+  localStorage.setItem('admin_auth','true');
+  showPanel();
+}
+function showPanel(){
+  document.getElementById('loginBtn').style.display='none';
+  document.getElementById('pass').style.display='none';
+  document.getElementById('err').style.display='none';
+  document.getElementById('panel').style.display='block';
+  load();
+}
+function logout(){ localStorage.removeItem('admin_auth'); location.reload(); }
+if(localStorage.getItem('admin_auth')==='true'){ showPanel(); }
+
+function load(){
+  let c=null;
+  try{ c=JSON.parse(localStorage.getItem('riya_config')); }catch(e){}
+  if(!c){
+    fetch('config.json').then(r=>r.json()).then(show).catch(()=>{
+      show({upi:"",qr:"",bookingAmount:300, telegram:"Sonal_0101", prices:{"1 Hour":2000,"2 Hour":3000,"3 Hour":4000,"Full Night":6000}});
+    });
+    return;
+  }
+  show(c);
+}
+function show(c){
+  document.getElementById('upi').value=c.upi||'';
+  document.getElementById('qr').value=c.qr||'';
+  document.getElementById('amt').value=c.bookingAmount||300;
+  document.getElementById('tg').value=c.telegram||'Sonal_0101';
+  if(c.prices){
+    document.getElementById('p1').value=c.prices['1 Hour']||2000;
+    document.getElementById('p2').value=c.prices['2 Hour']||3000;
+    document.getElementById('p3').value=c.prices['3 Hour']||4000;
+    document.getElementById('p4').value=c.prices['Full Night']||6000;
+  }
+  document.getElementById('out').value=JSON.stringify(c,null,2);
+}
+function save(){
+  let newConfig={
+    upi: document.getElementById('upi').value.trim(),
+    qr: document.getElementById('qr').value.trim(),
+    bookingAmount: parseInt(document.getElementById('amt').value)||300,
+    telegram: document.getElementById('tg').value.trim()||'Sonal_0101',
+    prices:{
+      "1 Hour": parseInt(document.getElementById('p1').value)||2000,
+      "2 Hour": parseInt(document.getElementById('p2').value)||3000,
+      "3 Hour": parseInt(document.getElementById('p3').value)||4000,
+      "Full Night": parseInt(document.getElementById('p4').value)||6000
+    },
+    bot:"", chat:""
+  };
+  // 1. Turant aapke phone pe update
+  localStorage.setItem('riya_config', JSON.stringify(newConfig));
+  // 2. Purana bot/chat save rakho agar config.json me tha
+  fetch('config.json').then(r=>r.json()).then(old=>{
+    if(old.bot) newConfig.bot=old.bot;
+    if(old.chat) newConfig.chat=old.chat;
+    finishSave(newConfig);
+  }).catch(()=>{ finishSave(newConfig); });
+}
+function finishSave(newConfig){
+  localStorage.setItem('riya_config', JSON.stringify(newConfig));
+  document.getElementById('out').value=JSON.stringify(newConfig,null,2);
+  document.getElementById('msg').innerHTML='✅ Saved! Aapke phone pe website turant update ho gayi hai.<br>2 Person pe ab ₹'+(newConfig.bookingAmount*2)+' advance lagega.';
+}
+</script>
+</body></html>
