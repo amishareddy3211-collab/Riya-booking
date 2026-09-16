@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonali Spa & Stay - Official Booking</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{font-family:'Poppins',sans-serif}.step{display:none}.step.active{display:block}</style>
+</head>
+<body class="bg-[#0a0a0b] text-white min-h-screen">
+<header class="max-w-md mx-auto p-5 flex justify-between items-center">
+<h1 class="font-bold text-xl">SONALI <span class="text-[#ff2e7e]">SPA & STAY</span></h1>
+<div class="text-[10px] bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full">● Booking Open</div>
+</header>
+<div class="max-w-md mx-auto p-4">
+<div class="flex gap-2 mb-6"><div id="p1b" class="h-1 flex-1 bg-[#ff2e7e] rounded"></div><div id="p2b" class="h-1 flex-1 bg-zinc-800 rounded"></div><div id="p3b" class="h-1 flex-1 bg-zinc-800 rounded"></div><div id="p4b" class="h-1 flex-1 bg-zinc-800 rounded"></div></div>
+<div class="bg-white text-black rounded-[32px] p-6 shadow-2xl">
+<!-- STEP 1 -->
+<div id="step1" class="step active"><h2 class="font-bold text-xl">Customer Details</h2><p class="text-xs text-zinc-500">Enter your details</p><input id="cName" placeholder="Full Name" class="w-full mt-5 p-4 bg-zinc-100 rounded-2xl outline-none text-sm"><input id="cPhone" placeholder="Phone / WhatsApp Number" class="w-full mt-3 p-4 bg-zinc-100 rounded-2xl outline-none text-sm"><button onclick="nextStep(2)" class="w-full mt-6 bg-black text-white p-4 rounded-2xl font-bold">Continue →</button></div>
+<!-- STEP 2 -->
+<div id="step2" class="step"><h2 class="font-bold text-xl">Select Package</h2><p class="text-xs text-zinc-500">Choose your plan</p><div id="pkgList" class="mt-5 space-y-3"></div><div class="flex gap-3 mt-6"><button onclick="nextStep(1)" class="flex-1 bg-zinc-100 p-4 rounded-2xl font-bold">Back</button><button onclick="nextStep(3)" class="flex-[2] bg-black text-white p-4 rounded-2xl font-bold">Continue</button></div></div>
+<!-- STEP 3 -->
+<div id="step3" class="step"><h2 class="font-bold text-xl">Select Timing</h2><p class="text-xs text-zinc-500">When do you want to visit?</p><div class="bg-zinc-900 text-white rounded-2xl p-4 mt-5 flex justify-between"><div><p class="text-[10px] text-zinc-400">SHOP TIMING</p><p id="timingShow" class="font-bold">10:00 AM - 10:00 PM</p></div></div><input id="bDate" type="date" class="w-full mt-4 p-4 bg-zinc-100 rounded-2xl text-sm"><input id="bTime" type="time" class="w-full mt-3 p-4 bg-zinc-100 rounded-2xl text-sm"><div class="flex gap-3 mt-6"><button onclick="nextStep(2)" class="flex-1 bg-zinc-100 p-4 rounded-2xl font-bold">Back</button><button onclick="nextStep(4)" class="flex-[2] bg-black text-white p-4 rounded-2xl font-bold">Continue to Payment →</button></div></div>
+<!-- STEP 4 -->
+<div id="step4" class="step"><h2 class="font-bold text-xl">Payment</h2><p class="text-xs text-zinc-500">Advance ₹450 to confirm booking</p><div class="text-center mt-5"><img id="qrImg" class="w-44 h-44 mx-auto rounded-2xl border"><p id="upiShow" class="text-xs mt-2 text-zinc-500"></p><p id="finalPkg" class="font-bold mt-3 text-sm"></p></div><label class="text-xs font-semibold mt-5 block">Upload Payment Screenshot *</label><input id="ss" type="file" accept="image/*" onchange="preview(this)" class="w-full mt-2 p-3 bg-zinc-100 rounded-xl text-xs"><img id="prev" class="hidden w-full mt-3 rounded-xl"><button onclick="submitFinal()" class="w-full mt-6 bg-[#ff2e7e] text-white p-4 rounded-2xl font-bold">Done - Confirm Booking</button></div>
+</div>
+<p class="text-[10px] text-center text-zinc-600 mt-4">© 2026 Sonali Spa & Stay</p>
+</div>
+<script>
+let cfg={}, selectedPkg='', selectedAmt=0;
+fetch('config.json').then(r=>r.json()).then(c=>{cfg=c; document.getElementById('qrImg').src=c.qr; document.getElementById('upiShow').innerText='UPI: '+c.upi; document.getElementById('timingShow').innerText=c.timing; document.getElementById('pkgList').innerHTML=`<div onclick="pick('1 Hour Classic Spa - ₹${c.p1}',${c.p1})" class="pkg border-2 border-[#ff2e7e] bg-pink-50 rounded-2xl p-4 flex justify-between cursor-pointer"><div><p class="font-semibold text-sm">1 Hour Classic Spa</p><p class="text-[11px] text-zinc-500">60 Min</p></div><b class="text-[#ff2e7e]">₹${c.p1}</b></div><div onclick="pick('2 Hour Aroma Therapy - ₹${c.p2}',${c.p2})" class="pkg border border-zinc-200 rounded-2xl p-4 flex justify-between cursor-pointer"><div><p class="font-semibold text-sm">2 Hour Aroma Therapy</p><p class="text-[11px] text-zinc-500">120 Min</p></div><b>₹${c.p2}</b></div><div onclick="pick('3 Hour Luxury Package - ₹${c.p3}',${c.p3})" class="pkg border border-zinc-200 rounded-2xl p-4 flex justify-between cursor-pointer"><div><p class="font-semibold text-sm">3 Hour Luxury Package</p><p class="text-[11px] text-zinc-500">180 Min</p></div><b>₹${c.p3}</b></div><div onclick="pick('Overnight Wellness Stay - ₹${c.p4}',${c.p4})" class="pkg border border-zinc-200 rounded-2xl p-4 flex justify-between cursor-pointer"><div><p class="font-semibold text-sm">Overnight Wellness Stay</p><p class="text-[11px] text-zinc-500">Full Night</p></div><b>₹${c.p4}</b></div>`; selectedPkg=`1 Hour Classic Spa - ₹${c.p1}`;});
+function nextStep(n){if(n==2){if(!cName.value||!cPhone.value) return alert('Enter Name & Phone')} if(n==4){if(!bDate.value||!bTime.value) return alert('Select Date & Time'); document.getElementById('finalPkg').innerText=selectedPkg} document.querySelectorAll('.step').forEach(s=>s.classList.remove('active')); document.getElementById('step'+n).classList.add('active'); for(let i=1;i<=4;i++)document.getElementById('p'+i+'b').className='h-1 flex-1 rounded '+(i<=n?'bg-[#ff2e7e]':'bg-zinc-800')}
+function pick(name,amt){selectedPkg=name; selectedAmt=amt; document.querySelectorAll('.pkg').forEach(p=>{p.classList.remove('border-2','border-[#ff2e7e]','bg-pink-50');p.classList.add('border','border-zinc-200')}); event.currentTarget.classList.add('border-2','border-[#ff2e7e]','bg-pink-50');}
+function preview(input){if(input.files[0]){let r=new FileReader();r.onload=e=>{prev.src=e.target.result;prev.classList.remove('hidden')};r.readAsDataURL(input.files[0])}}
+async function submitFinal(){if(!ss.files[0]) return alert('Please upload payment screenshot'); let caption=`🔔 New Booking%0AName: ${cName.value}%0APhone: ${cPhone.value}%0APackage: ${selectedPkg}%0ADate: ${bDate.value} ${bTime.value}`; if(cfg.bot && cfg.bot!='YOUR_BOT_TOKEN_YAHAN'){ let fd=new FormData(); fd.append('chat_id',cfg.chat); fd.append('photo',ss.files[0]); fd.append('caption',decodeURIComponent(caption)); await fetch(`https://api.telegram.org/bot${cfg.bot}/sendPhoto`,{method:'POST',body:fd}); } alert('Booking Confirmed! Sent to Telegram.'); location.reload();}
+</script>
+</body>
+</html>
