@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Auto Update - Riya Spa</title>
+<style>
+body{font-family:Inter,sans-serif; background:#f5f5f3; padding:16px; margin:0;}
+.card{max-width:460px; margin:auto; background:#fff; padding:20px; border-radius:22px; box-shadow:0 20px 60px rgba(0,0,0,0.12);}
+.input{width:100%; padding:12px; border-radius:11px; border:1px solid #ddd; margin:6px 0 12px; background:#fafafa; box-sizing:border-box; font-size:13px;}
+.btn{width:100%; background:#111; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:700; margin-top:12px; cursor:pointer;}
+label{font-size:10px; font-weight:800; color:#888; letter-spacing:1px; display:block;}
+h2{text-align:center; letter-spacing:3px; margin:0;}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.section{background:#fafafa; border:1px solid #eee; border-radius:14px; padding:12px; margin-top:14px;}
+.section-title{font-size:11px; font-weight:800; letter-spacing:1px; color:#111; margin-bottom:8px;}
+#status{margin-top:12px; text-align:center; font-weight:700; font-size:13px;}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>AUTO ADMIN</h2>
+<p style="text-align:center; font-size:10px; color:#999; margin:4px 0 14px;">CHANGE HERE = AUTO UPDATE ON WEBSITE</p>
+
+<div class="section">
+<div class="section-title">🔑 GITHUB SETUP (1 Time Only)</div>
+<label>GitHub Username</label><input id="gh_user" class="input" value="amishareddy3211-collab">
+<label>Repository Name</label><input id="gh_repo" class="input" value="Riya-booking">
+<label>GitHub Personal Token (ghp_...)</label><input id="gh_token" type="password" class="input" placeholder="Token paste karo">
+<p style="font-size:10px; color:#888;">Token kaise banaye: GitHub > Settings > Developer settings > Personal access tokens > Generate > repo tick karo</p>
+</div>
+
+<div class="section">
+<div class="section-title">💳 PAYMENT SETTINGS</div>
+<label>UPI ID</label><input id="upi" class="input">
+<label>QR Code Link</label><input id="qr" class="input">
+<label>Booking Amount (Advance)</label><input id="bookingAmount" type="number" class="input">
+</div>
+
+<div class="section">
+<div class="section-title">💰 RATE LIST (1 Person Price - 2 Person Auto Double)</div>
+<div class="grid">
+<div><label>1 HOUR</label><input id="p1" type="number" class="input"></div>
+<div><label>2 HOUR</label><input id="p2" type="number" class="input"></div>
+<div><label>3 HOUR</label><input id="p3" type="number" class="input"></div>
+<div><label>FULL NIGHT</label><input id="p4" type="number" class="input"></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">🤖 TELEGRAM</div>
+<label>Bot Token</label><input id="bot" class="input">
+<label>Chat ID</label><input id="chat" class="input">
+<label>Telegram Username</label><input id="telegram" class="input">
+</div>
+
+<button class="btn" id="saveBtn" onclick="autoUpdate()">🚀 SAVE & AUTO UPDATE WEBSITE</button>
+<p id="status"></p>
+</div>
+
+<script>
+let sha=null;
+fetch('config.json').then(r=>r.json()).then(c=>{
+ document.getElementById('upi').value=c.upi||''; document.getElementById('qr').value=c.qr||'';
+ document.getElementById('bot').value=c.bot||''; document.getElementById('chat').value=c.chat||'';
+ document.getElementById('bookingAmount').value=c.bookingAmount||300;
+ document.getElementById('telegram').value=c.telegram||'Sonal_0101';
+ document.getElementById('p1').value=c.prices?c.prices['1 Hour']:2000;
+ document.getElementById('p2').value=c.prices?c.prices['2 Hour']:3000;
+ document.getElementById('p3').value=c.prices?c.prices['3 Hour']:4000;
+ document.getElementById('p4').value=c.prices?c.prices['Full Night']:6000;
+});
+// get file sha for update
+async function getSha(user,repo,token){
+ let res=await fetch(`https://api.github.com/repos/${user}/${repo}/contents/config.json`,{headers:{Authorization:`token ${token}`}});
+ if(res.ok){ let j=await res.json(); return j.sha; } return null;
+}
+async function autoUpdate(){
+ let btn=document.getElementById('saveBtn'); let st=document.getElementById('status');
+ let user=document.getElementById('gh_user').value.trim();
+ let repo=document.getElementById('gh_repo').value.trim();
+ let token=document.getElementById('gh_token').value.trim();
+ if(!token){ alert('GitHub Token dalo pehle'); return; }
+ btn.innerText='Updating...'; st.innerText='⏳ Website update ho rahi hai...';
+ let newConfig={
+  upi: document.getElementById('upi').value.trim(),
+  qr: document.getElementById('qr').value.trim(),
+  bot: document.getElementById('bot').value.trim(),
+  chat: document.getElementById('chat').value.trim(),
+  bookingAmount: parseInt(document.getElementById('bookingAmount').value)||300,
+  telegram: document.getElementById('telegram').value.trim()||'Sonal_0101',
+  prices:{
+   "1 Hour": parseInt(document.getElementById('p1').value)||2000,
+   "2 Hour": parseInt(document.getElementById('p2').value)||3000,
+   "3 Hour": parseInt(document.getElementById('p3').value)||4000,
+   "Full Night": parseInt(document.getElementById('p4').value)||6000
+  }
+ };
+ try{
+  let sha=await getSha(user,repo,token);
+  let content=btoa(unescape(encodeURIComponent(JSON.stringify(newConfig,null,2))));
+  let res=await fetch(`https://api.github.com/repos/${user}/${repo}/contents/config.json`,{
+   method:'PUT',
+   headers:{Authorization:`token ${token}`,'Content-Type':'application/json'},
+   body:JSON.stringify({message:'Update config from admin panel',content:content,sha:sha})
+  });
+  let data=await res.json();
+  if(res.ok){
+   st.innerHTML='✅ <span style="color:green;">Website 2 Minute Me Auto Update Ho Jayegi!</span><br><a href="https://'+user+'.github.io/'+repo+'/" target="_blank">Website Dekho</a>';
+   btn.innerText='🚀 Updated Successfully';
+  } else { st.innerText='❌ Error: '+(data.message||'Token check karo'); btn.innerText='🚀 Try Again'; }
+ } catch(e){ st.innerText='❌ Error: '+e.message; btn.innerText='🚀 Try Again'; }
+}
+</script>
+</body>
+</html>
