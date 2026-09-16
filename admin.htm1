@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sonali Admin Panel</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-black text-white p-4">
+<div id="login" class="max-w-sm mx-auto mt-20 bg-zinc-900 p-6 rounded-[24px]"><h2 class="font-bold text-xl">Admin Login</h2><input id="pass" type="password" placeholder="Password" class="w-full mt-4 p-4 rounded-xl bg-zinc-800"><button onclick="login()" class="w-full mt-4 bg-[#ff2e7e] p-4 rounded-xl font-bold">Login</button><p class="text-[10px] text-zinc-500 mt-2">Password: sonali123</p></div>
+<div id="panel" style="display:none" class="max-w-xl mx-auto">
+<h1 class="text-2xl font-bold">Sonali - Admin Panel</h1>
+<div class="bg-zinc-900 p-5 rounded-[20px] mt-6"><h3 class="font-bold">QR & UPI</h3><input id="qr" placeholder="QR Image Link" class="w-full mt-3 p-3 bg-zinc-800 rounded-xl text-sm"><input id="upi" placeholder="UPI ID" class="w-full mt-3 p-3 bg-zinc-800 rounded-xl text-sm"></div>
+<div class="bg-zinc-900 p-5 rounded-[20px] mt-4"><h3 class="font-bold">Hourly Price Change</h3><div class="grid grid-cols-2 gap-3 mt-3"><input id="p1" class="p-3 bg-zinc-800 rounded-xl text-sm" placeholder="1 Hour"><input id="p2" class="p-3 bg-zinc-800 rounded-xl text-sm" placeholder="2 Hour"><input id="p3" class="p-3 bg-zinc-800 rounded-xl text-sm" placeholder="3 Hour"><input id="p4" class="p-3 bg-zinc-800 rounded-xl text-sm" placeholder="Overnight"></div><input id="timing" placeholder="Timing" class="w-full mt-3 p-3 bg-zinc-800 rounded-xl text-sm"></div>
+<div class="bg-zinc-900 p-5 rounded-[20px] mt-4"><h3 class="font-bold">Telegram Bot</h3><input id="bot" placeholder="Bot Token" class="w-full mt-3 p-3 bg-zinc-800 rounded-xl text-sm"><input id="chat" placeholder="Chat ID" class="w-full mt-3 p-3 bg-zinc-800 rounded-xl text-sm"></div>
+<button onclick="saveAll()" class="w-full mt-6 bg-green-600 p-4 rounded-xl font-bold">SAVE & GENERATE CONFIG</button>
+<div class="bg-zinc-900 p-5 rounded-[20px] mt-6"><h3 class="font-bold">Generated config.json (Copy this)</h3><p class="text-[10px] text-zinc-500 mt-1">Isko copy karke config.json file me paste kar do aur Commit kar do</p><textarea id="out" class="w-full mt-3 p-3 bg-black rounded-xl text-[11px] h-40"></textarea><button onclick="copy()" class="mt-3 bg-zinc-800 px-4 py-2 rounded-xl text-xs">Copy</button></div>
+</div>
+<script>
+function login(){if(pass.value==='sonali123'){document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block';load()}else alert('Wrong Password')}
+function load(){fetch('config.json').then(r=>r.json()).then(s=>{qr.value=s.qr;upi.value=s.upi;p1.value=s.p1;p2.value=s.p2;p3.value=s.p3;p4.value=s.p4;timing.value=s.timing;bot.value=s.bot;chat.value=s.chat;gen()})}
+function saveAll(){gen();alert('Config Generated! Neeche se copy karke config.json me paste karo.')}
+function gen(){let j={qr:qr.value,upi:upi.value,p1:p1.value,p2:p2.value,p3:p3.value,p4:p4.value,timing:timing.value,bot:bot.value,chat:chat.value}; out.value=JSON.stringify(j,null,2)}
+function copy(){out.select();document.execCommand('copy');alert('Copied!')}
+</script>
+</body></html>
