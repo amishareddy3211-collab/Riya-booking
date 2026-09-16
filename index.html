@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riya - 5 Step</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@600&display=swap" rel="stylesheet">
+<script>let L=localStorage.getItem('riya_config');if(L){try{window.OVERRIDE_CONFIG=JSON.parse(L);}catch(e){}}</script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter;background:#0a0a0a}.main{max-width:420px;margin:auto;background:#fff;min-height:100vh}.top{background:#111;color:#fff;padding:22px;text-align:center}.top h1{font-family:Playfair Display;letter-spacing:6px;font-size:24px}.step{background:#D9FF66;color:#111;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:900;display:inline-block;margin:14px 0 8px}.opt{border:1.5px solid #eee;background:#f9f9f9;padding:13px;border-radius:14px;text-align:center;font-weight:800;cursor:pointer}.opt.active{background:#111;color:#fff}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.input{width:100%;padding:12px;border-radius:12px;border:1.5px solid #eee;background:#f8f8f8}.box{background:#111;color:#fff;border-radius:18px;padding:14px;display:flex;justify-content:space-between}.book{width:100%;background:#D9FF66;border:none;padding:16px;border-radius:14px;font-weight:900;margin-top:10px}</style>
+</head><body><div class="main">
+<div class="top"><h1>RIYA SPA</h1><p style="font-size:9px;color:#777;letter-spacing:3px">FIVE STAR PREMIUM</p></div>
+<div style="padding:16px">
+<div class="step">STEP 1 : YOUR DETAILS</div>
+<div style="display:flex;gap:8px"><input id="name" class="input" placeholder="Your Name"><input id="mob" class="input" placeholder="Mobile"></div>
+
+<div class="step">STEP 2 : SELECT PLAN</div>
+<div class="grid"><div class="opt active" onclick="sS(this,'1 Hour')">1 Hour<br>₹2000</div><div class="opt" onclick="sS(this,'2 Hour')">2 Hour<br>₹3000</div><div class="opt" onclick="sS(this,'3 Hour')">3 Hour<br>₹4000</div><div class="opt" onclick="sS(this,'Full Night')">Full Night<br>₹6000</div></div>
+
+<div class="step">STEP 3 : PERSON - AUTO DOUBLE</div>
+<div class="grid"><div class="opt active" onclick="sP(this,1)">1 Person</div><div class="opt" onclick="sP(this,2)">2 Person</div></div>
+
+<div class="step">STEP 4 : PRICE</div>
+<div class="box"><div><div style="font-size:9px;color:#aaa">TOTAL</div><h2 id="total">₹2000</h2></div><div style="text-align:right"><div style="font-size:9px;color:#aaa">ADVANCE</div><h2 id="adv" style="color:#D9FF66">₹300</h2></div></div>
+
+<div class="step">STEP 5 : BOOK & PAY</div>
+<button class="book" onclick="book()">BOOK NOW - PAY <span id="bamt">₹300</span></button>
+<div id="payBox" style="display:none;margin-top:12px;border:2px dashed #ccc;border-radius:18px;padding:14px;text-align:center"><div id="payAmt" style="font-size:28px;font-weight:900">₹300</div><img id="qr" style="width:180px;display:none;margin:10px auto"><div>UPI: <b id="upi">loading</b></div><input type="file" id="ss" class="input" style="margin-top:8px"><button class="book" style="background:#111;color:#fff" onclick="confirm()">CONFIRM</button></div>
+<div id="doneBox" style="display:none;background:#111;color:#fff;border-radius:18px;padding:20px;text-align:center;margin-top:12px"><h3>Confirmed</h3><a id="tg" href="#" style="display:block;background:#D9FF66;color:#111;padding:12px;border-radius:12px;text-decoration:none;font-weight:800;margin-top:10px">Telegram</a></div>
+</div></div>
+<script>
+let S='1 Hour',P=1,CFG=null;
+async function getC(){if(window.OVERRIDE_CONFIG)return window.OVERRIDE_CONFIG;let r=await fetch('config.json');return r.json();}
+getC().then(c=>{CFG=c;document.getElementById('upi').innerText=c.upi;if(c.qr){let q=document.getElementById('qr');q.src=c.qr;q.style.display='block';}document.getElementById('tg').href='https://telegram.me/'+(c.telegram||'Sonal_0101');upd();});
+function sS(e,s){for(let x of e.parentElement.children)x.classList.remove('active');e.classList.add('active');S=s;upd();}
+function sP(e,n){for(let x of e.parentElement.children)x.classList.remove('active');e.classList.add('active');P=n;upd();}
+function upd(){if(!CFG)return;let prices={"1 Hour":2000,"2 Hour":3000,"3 Hour":4000,"Full Night":6000};let base=(CFG.prices&&CFG.prices[S])||prices[S]||2000;let total=base*P;let adv=(CFG.bookingAmount||300)*P;document.getElementById('total').innerText='₹'+total;document.getElementById('adv').innerText='₹'+adv;document.getElementById('bamt').innerText='₹'+adv;document.getElementById('payAmt').innerText='₹'+adv;}
+function book(){if(!name.value.trim()||!mob.value.trim()){alert('Name Mobile');return;}upd();payBox.style.display='block';scrollTo(0,9999);}
+function confirm(){if(!ss.files[0]){alert('Screenshot');return;}payBox.style.display='none';doneBox.style.display='block';}
+</script></body></html>
