@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riya Booking - Pay 300 After Details</title>
+<style>
+body{font-family: Arial; background:#ffe6f2; padding:12px; margin:0;}
+.card{background:#fff; padding:18px; border-radius:20px; max-width:420px; margin:auto; box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+.step-box{background:#000; color:#fff; padding:14px; border-radius:12px; text-align:center; border-left:6px solid #00ff88; border-right:6px solid #00ff88;}
+.big-amount-box{background: linear-gradient(135deg, #ff0a78, #8a2be2); color:#fff; padding:18px; border-radius:15px; text-align:center; margin:15px 0; box-shadow:0 8px 20px rgba(255,10,120,0.3);}
+.qr-box{border:3px dashed #d1006a; padding:10px; border-radius:15px; text-align:center; margin:15px 0;}
+.upi-row{background:#f5f5f5; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;}
+.btn{padding:12px; border-radius:10px; text-decoration:none; color:#fff; display:block; text-align:center; margin:8px 0; font-weight:bold;}
+select, input{width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #ccc; box-sizing:border-box;}
+.remaining{background:#e8ffe8; padding:12px; border-radius:10px; text-align:center; border:1px solid #00aa00;}
+</style>
+</head>
+<body>
+<div class="card">
+<h2 style="text-align:center; margin:0;">Riya Spa Booking</h2>
+
+<!-- 1. IMPORTANT TEXT -->
+<div class="step-box">
+<div style="color:#00ff88; font-size:12px; letter-spacing:2px; font-weight:bold;">⚠️ IMPORTANT STEP ⚠️</div>
+<div style="font-size:19px; font-weight:900; margin:8px 0;">Pay <span style="color:#00ff88; font-size:26px;">₹300</span> Booking Amount<br><span style="color:#ffcc00; font-size:16px;">AFTER All Details Share</span></div>
+<div style="font-size:11px; background:#222; padding:6px; border-radius:6px;">Details → Screenshot → Payment</div>
+</div>
+
+<!-- 2. PACKAGE SELECT -->
+<label>Service Select Karo:</label>
+<select id="package" onchange="calcRemaining()">
+<option value="2000">Full Body - ₹2000</option>
+<option value="3000">Full Body + Extra - ₹3000</option>
+<option value="4000">Premium - ₹4000</option>
+<option value="6000">VIP - ₹6000</option>
+</select>
+
+<div class="remaining" id="remainingBox"></div>
+
+<!-- 3. DETAILS -->
+<input type="text" id="name" placeholder="Aapka Naam">
+<input type="text" id="phone" placeholder="Phone Number">
+<input type="file" id="screenshot">
+<p style="font-size:12px; color:#666; text-align:center;">Screenshot upload karne ke baad hi pay karo</p>
+
+<!-- 4. SCANNER + 300 BIG -->
+<div class="big-amount-box">
+<div style="font-size:13px; letter-spacing:2px;">BOOKING CONFIRMATION</div>
+<div style="font-size:38px; font-weight:900;">₹300 ONLY</div>
+<div style="font-size:12px; background:rgba(255,255,255,0.2); display:inline-block; padding:5px 12px; border-radius:20px;">Scanner Ke Upar Amount</div>
+</div>
+
+<div class="qr-box">
+<img id="qrImg" src="" width="220"><br>
+<p style="margin:5px 0; font-size:13px;">QR Scan Karke Pay Karo</p>
+</div>
+
+<!-- 5. UPI COPY + DIRECT PAY -->
+<div class="upi-row">
+<b id="upiId">sonali-5411@ptyes</b>
+<button onclick="copyUpi()" style="background:#000; color:#fff; border:none; padding:7px 14px; border-radius:6px;">Copy</button>
+</div>
+<p id="copyMsg" style="color:green; display:none; text-align:center; font-size:13px;">UPI Copied!</p>
+
+<a id="gpayBtn" class="btn" style="background:#4285F4;" href="">📱 Tap to Pay with Google Pay</a>
+<a id="phonepeBtn" class="btn" style="background:#5f259f;" href="">💜 Tap to Pay with PhonePe</a>
+<a id="paytmBtn" class="btn" style="background:#00baf2;" href="">💙 Tap to Pay with Paytm</a>
+
+<button onclick="sendBooking()" style="background:#000; color:#fff; width:100%; padding:16px; border:none; border-radius:12px; font-size:18px; font-weight:bold; margin-top:15px;">✅ Booking Confirm Karo</button>
+<p id="status" style="text-align:center; font-weight:bold;"></p>
+
+</div>
+
+<script>
+let config={};
+fetch('config.json').then(r=>r.json()).then(c=>{
+  config=c;
+  document.getElementById('qrImg').src=c.qr;
+  document.getElementById('upiId').innerText=c.upi;
+  let upiLink=`upi://pay?pa=${c.upi}&pn=Sonali&am=300&cu=INR`;
+  document.getElementById('gpayBtn').href=upiLink;
+  document.getElementById('phonepeBtn').href=upiLink;
+  document.getElementById('paytmBtn').href=upiLink;
+  calcRemaining();
+});
+function copyUpi(){
+  navigator.clipboard.writeText(document.getElementById('upiId').innerText);
+  document.getElementById('copyMsg').style.display='block';
+  setTimeout(()=>{document.getElementById('copyMsg').style.display='none'},2000);
+}
+function calcRemaining(){
+  let total=document.getElementById('package').value;
+  let remain=total-300;
+  document.getElementById('remainingBox').innerHTML=`Total Package: ₹${total}<br>Booking Paid: - ₹300<br><b style="font-size:18px; color:#d1006a;">Remaining at Spa: ₹${remain}</b>`;
+}
+function sendBooking(){
+  let name=document.getElementById('name').value;
+  let phone=document.getElementById('phone').value;
+  let pkg=document.getElementById('package').value;
+  let file=document.getElementById('screenshot').files[0];
+  if(!name||!phone||!file){alert('Naam, Phone aur Payment Screenshot zaroori hai'); return;}
+  document.getElementById('status').innerText='Sending to Telegram...';
+  let formData=new FormData();
+  formData.append('chat_id', config.chat);
+  formData.append('photo', file);
+  formData.append('caption', `🔥 NEW BOOKING\nName: ${name}\nPhone: ${phone}\nPackage: ₹${pkg}\nBooking Paid: ₹300\nRemaining: ₹${pkg-300}`);
+  fetch(`https://api.telegram.org/bot${config.bot}/sendPhoto`, {method:'POST', body:formData})
+  .then(r=>r.json()).then(d=>{
+    if(d.ok){document.getElementById('status').innerText='✅ Booking Sent!'; alert('Booking Successful!');}
+    else{document.getElementById('status').innerText='❌ Chat ID galat hai, getUpdates wala link open karo';}
+  });
+}
+</script>
+</body>
+</html>
