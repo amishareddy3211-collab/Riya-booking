@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riya Spa - Udaipur</title>
+<script>
+let localConfig = localStorage.getItem('riya_config');
+if(localConfig){ try{ window.OVERRIDE_CONFIG = JSON.parse(localConfig); }catch(e){} }
+</script>
+<style>
+body{font-family:Inter,sans-serif; background:#f5f5f3; margin:0;}
+.container{max-width:440px; margin:auto; background:#fff; min-height:100vh;}
+.header{padding:18px; text-align:center; border-bottom:1px solid #eee;}
+.header h1{letter-spacing:4px; margin:0; font-size:22px;}
+.card{padding:16px;}
+.label{font-size:11px; font-weight:800; color:#888; margin:14px 0 6px; display:block;}
+.input{width:100%; padding:13px; border-radius:12px; border:1px solid #ddd; background:#fafafa; box-sizing:border-box;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.opt{border:1px solid #ddd; border-radius:14px; padding:14px; text-align:center; cursor:pointer; background:#fafafa; font-weight:600;}
+.opt.active{border-color:#111; background:#111; color:#fff;}
+.priceBox{background:#111; color:#fff; border-radius:18px; padding:16px; margin-top:16px; text-align:center;}
+.btn{width:100%; background:#111; color:#fff; border:none; padding:16px; border-radius:14px; font-weight:800; margin-top:16px; cursor:pointer;}
+.btn-green{background:#D9FF66; color:#111;}
+.payBox{border:1px dashed #bbb; border-radius:16px; padding:16px; text-align:center; margin-top:16px; background:#fafafa;}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>RIYA SPA</h1><p style="font-size:10px; color:#999; letter-spacing:2px; margin:4px 0 0;">UDAIPUR - PREMIUM SERVICE</p></div>
+<div class="card">
+<label class="label">SELECT SERVICE</label>
+<div class="grid2">
+<div class="opt active" onclick="selectService(this,'1 Hour')">1 Hour</div>
+<div class="opt" onclick="selectService(this,'2 Hour')">2 Hour</div>
+<div class="opt" onclick="selectService(this,'3 Hour')">3 Hour</div>
+<div class="opt" onclick="selectService(this,'Full Night')">Full Night</div>
+</div>
+<label class="label">SELECT PERSONS</label>
+<div class="grid2">
+<div class="opt active" onclick="selectPerson(this,1)">1 Person</div>
+<div class="opt" onclick="selectPerson(this,2)">2 Person (Double Advance)</div>
+</div>
+<label class="label">YOUR NAME</label><input id="custName" class="input" placeholder="Enter name">
+<label class="label">MOBILE NUMBER</label><input id="custMobile" class="input" placeholder="Enter mobile">
+<div class="priceBox"><div style="font-size:11px; color:#aaa;">TOTAL AMOUNT</div><h2 id="totalPrice" style="margin:0;">₹ 2000</h2><div id="breakup" style="font-size:11px; color:#aaa; margin-top:4px;">1 Hour x 1 Person</div></div>
+<button class="btn" onclick="bookNow()">BOOK NOW - PAY <span id="bookAmt">₹300</span> ADVANCE</button>
+<div id="paymentBox" style="display:none;"><div class="payBox">
+<div style="font-weight:800;" id="payTitle">PAY BOOKING AMOUNT</div>
+<div style="font-size:26px; font-weight:800; margin:8px 0;" id="payAmount">₹300</div>
+<div id="payNote" style="font-size:11px; color:#888; background:#eee; padding:6px; border-radius:20px; display:inline-block;">1 Person Advance</div>
+<img id="qrImg" src="" style="width:200px; height:200px; border-radius:12px; border:1px solid #ddd; display:none; margin:12px auto;">
+<div style="font-size:13px; margin-top:8px;">UPI ID: <b id="upiId">loading...</b> <button onclick="copyUpi()">Copy</button></div>
+<input type="file" id="ss" accept="image/*" class="input" style="margin-top:10px;">
+<button class="btn btn-green" onclick="confirmBooking()">✅ I HAVE PAID - CONFIRM</button>
+</div></div>
+<div id="successBox" style="display:none; margin-top:18px; text-align:center; background:#111; border-radius:20px; padding:20px; color:#fff;">
+<div style="font-size:40px;">✅</div><div style="font-size:18px; font-weight:800; margin-top:8px;">BOOKING CONFIRMED</div>
+<a id="telegramLink" href="https://telegram.me/Sonal_0101" target="_blank" style="display:block; margin-top:16px; background:#D9FF66; color:#111; text-decoration:none; padding:14px; border-radius:12px; font-weight:800;">📩 CONTACT ON TELEGRAM</a>
+</div>
+</div>
+</div>
+<script>
+let selectedService='1 Hour'; let selectedPerson=1; let CONFIG=null;
+async function getConfig(){ if(window.OVERRIDE_CONFIG) return window.OVERRIDE_CONFIG; let r=await fetch('config.json'); return await r.json(); }
+getConfig().then(c=>{
+  CONFIG=c;
+  document.getElementById('upiId').innerText=c.upi||'';
+  if(c.qr){ document.getElementById('qrImg').src=c.qr; document.getElementById('qrImg').style.display='block'; }
+  document.getElementById('telegramLink').href='https://telegram.me/'+(c.telegram||'Sonal_0101');
+  document.getElementById('telegramLink').innerText='📩 CONTACT ON TELEGRAM - @'+(c.telegram||'Sonal_0101');
+  updatePrice();
+});
+function selectService(el,s){ for(let ch of el.parentElement.children) ch.classList.remove('active'); el.classList.add('active'); selectedService=s; updatePrice(); }
+function selectPerson(el,n){ for(let ch of el.parentElement.children) ch.classList.remove('active'); el.classList.add('active'); selectedPerson=n; updatePrice(); }
+
+// YAHAN DOUBLE ADVANCE LOGIC HAI
+function updatePrice(){
+  if(!CONFIG||!CONFIG.prices) return;
+  let base = CONFIG.prices[selectedService]||2000;
+  let total = base * selectedPerson;
+  let bookingBase = CONFIG.bookingAmount||300;
+  let advance = bookingBase * selectedPerson; // <-- 2 person pe double
+
+  document.getElementById('totalPrice').innerText='₹ '+(total);
+  document.getElementById('breakup').innerText=selectedService+' x '+selectedPerson+' Person';
+  document.getElementById('bookAmt').innerText='₹'+advance;
+  document.getElementById('payAmount').innerText='₹'+advance;
+  document.getElementById('payTitle').innerText='PAY BOOKING AMOUNT - '+selectedPerson+' PERSON';
+  document.getElementById('payNote').innerText= selectedPerson==2? '2 Person = Double Advance (₹'+advance+')' : '1 Person Advance';
+}
+
+function bookNow(){
+  if(!document.getElementById('custName').value.trim()||!document.getElementById('custMobile').value.trim()){ alert('Name Mobile dalo'); return; }
+  updatePrice();
+  document.getElementById('paymentBox').style.display='block';
+  window.scrollTo(0,document.body.scrollHeight);
+}
+function copyUpi(){ navigator.clipboard.writeText(document.getElementById('upiId').innerText); alert('Copied'); }
+function confirmBooking(){ if(!document.getElementById('ss').files[0]){ alert('Screenshot dalo'); return; } document.getElementById('paymentBox').style.display='none'; document.getElementById('successBox').style.display='block'; }
+</script>
+</body>
+  </html>
