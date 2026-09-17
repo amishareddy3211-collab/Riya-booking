@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riya Admin</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>body{font-family:sans-serif;background:#0f0f0f;color:#fff;padding:18px} .card{max-width:480px;margin:auto;background:#1e1e1e;padding:20px;border-radius:16px} input{width:100%;padding:12px;margin:6px 0 10px;border-radius:10px;border:1px solid #444;background:#111;color:#fff} button{width:100%;padding:14px;border:none;border-radius:12px;background:#ff4da6;color:#fff;font-weight:800;font-size:16px} label{font-size:13px;color:#bbb;margin-top:12px;display:block}</style>
+</head>
+<body>
+<div class="card">
+<h2 style="color:#ff4da6">🔥 Riya Admin Final</h2>
+<label>UPI ID</label><input id="upi" placeholder="upi@bank">
+<label>QR Image URL (khali chhodo to auto banega)</label><input id="qr" placeholder="https://...">
+<label>Telegram Bot Token</label><input id="bot" placeholder="813...">
+<label>Telegram Chat ID</label><input id="chat" placeholder="-100...">
+<button onclick="save()">💾 SAVE</button>
+<p id="msg" style="display:none;color:#5eff8a;text-align:center;margin-top:10px"></p>
+</div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCaiUaTypvKoQXsyAlWtwfnxrPxQGZm2zg",authDomain:"sonali-booking.firebaseapp.com",databaseURL:"https://sonali-booking-default-rtdb.firebaseio.com",projectId:"sonali-booking",storageBucket:"sonali-booking.firebasestorage.app",messagingSenderId:"296739963642",appId:"1:296739963642:web:c28a3e90e9209a87163f43"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+function save(){
+ let d={upi:upi.value,qr:qr.value,bot:bot.value,chat:chat.value,updatedAt:new Date().toISOString()};
+ db.ref('sonali/config').set(d).then(()=>{msg.style.display='block';msg.innerText='✅ Saved! 2 sec me website live!';});
+}
+db.ref('sonali/config').once('value').then(s=>{let d=s.val();if(!d)return;upi.value=d.upi||'';qr.value=d.qr||'';bot.value=d.bot||'';chat.value=d.chat||'';});
+</script>
+</body>
+</html>
