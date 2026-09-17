@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonali Admin - Firebase</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui;background:#0f0f0f;color:#fff;margin:0;padding:18px}
+.card{max-width:480px;margin:auto;background:#1e1e1e;padding:20px;border-radius:16px;border:1px solid #333}
+h2{margin:0;color:#ff4da6}p{color:#888;font-size:13px}
+label{font-size:13px;color:#bbb;margin-top:12px;display:block}
+input{width:100%;padding:12px;margin:6px 0 10px;border-radius:10px;border:1px solid #444;background:#111;color:#fff}
+button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,#ff4da6,#ff8a5c);color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.ok{background:#0a3d1f;color:#5eff8a;padding:10px;border-radius:10px;display:none;text-align:center;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>🔥 Sonali Admin</h2>
+<p>Firebase Auto - Save karte hi website live!</p>
+<div id="msg" class="ok"></div>
+<label>UPI ID</label><input id="upi" placeholder="sonali@upi">
+<label>Amount ₹</label><input id="amount" type="number" placeholder="550">
+<label>Name</label><input id="name" placeholder="Sonali">
+<label>WhatsApp Number</label><input id="wa" placeholder="919999999999">
+<label>Photo 1 URL</label><input id="p1" placeholder="https://...">
+<label>Photo 2 URL</label><input id="p2" placeholder="https://...">
+<label>Photo 3 URL</label><input id="p3" placeholder="https://...">
+<button onclick="save()">💾 SAVE - 2 Sec Me Live</button>
+<p style="text-align:center;color:#555;font-size:11px;margin-top:10px">sonali-booking | 100% Auto</p>
+</div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCaiUaTypvKoQXsyAlWtwfnxrPxQGZm2zg",
+  authDomain: "sonali-booking.firebaseapp.com",
+  databaseURL: "https://sonali-booking-default-rtdb.firebaseio.com",
+  projectId: "sonali-booking",
+  storageBucket: "sonali-booking.firebasestorage.app",
+  messagingSenderId: "296739963642",
+  appId: "1:296739963642:web:c28a3e90e9209a87163f43"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+function save(){
+  const b=document.querySelector('button');b.innerText='Saving...';
+  const data={
+    upi:document.getElementById('upi').value.trim(),
+    amount:document.get
